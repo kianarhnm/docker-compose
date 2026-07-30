@@ -1,0 +1,42 @@
+name: Project1 CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name : Install Python
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        working-directory: bckend
+        run: pip install -r requirements.txt
+
+      - name: Test
+        working-directory: bckend
+        run: python bckend/manage.py check
+
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps: 
+    - uses: actions/checkout@v4
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+
+      with: 
+        node-version: "20"
+    - name: Install Node Dependencies
+      working-directory: front
+      run: npm install
+
+    - name: Build  
+      working-directory: front
+      run: npm run build

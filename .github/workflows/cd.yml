@@ -1,0 +1,31 @@
+name: Project CD
+
+on:
+  workflow_run:
+    workflows: ["Project1 CI"]
+    types:
+      - completed
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+      - uses: action/checkout@v4
+      - name: Build Docker Image
+        run: docker build -t kianarhnm/backend ./bckend
+
+      - name: Login Docker Hub
+        run: |
+          docker login \
+          -u ${{ secrets.DOCKER_USERNAME }}\
+          -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Image
+        run: docker push kianarhnm/backend
+
+      - name: Deploy
+        run: |
+          ssh user@ server " 
+          docker pull kianarhnm/bckend
+          docker compose up -d "
