@@ -1,0 +1,15 @@
+services:
+  backend:
+    build:
+      context: ./bckend
+      dockerfile: Dockerfile.prod
+    environment:
+      DEBUG: "false"
+
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile.prod
+    environment:
+      NODE_ENV: production
+

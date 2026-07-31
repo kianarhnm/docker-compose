@@ -11,3 +11,8 @@ restart:
 	docker compose restart
 test:
 	docker compose exec backend pytest
+
+prodb:
+	docker compose -f compose.yml -f compose.prod.yml build
+devb:
+	docker compose -f compose.yml -f compose.dev.yml build

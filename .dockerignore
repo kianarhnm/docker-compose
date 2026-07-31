@@ -1,5 +1,10 @@
 .git
 .github
+.gitignore
+
+Dockerfile*
+
+compose*.yml
 
 __pycache__/
 *.pyc
