@@ -55,7 +55,7 @@ export default function Home() {
     <main>
 
       <h1
-        style={{color: "red", dontsize: "40px"}}>
+        style={{color: "red", fontSize: "40px"}}>
       </h1>
 
 
