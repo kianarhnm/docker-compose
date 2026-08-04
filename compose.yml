@@ -1,6 +1,6 @@
 services:
   nginx-proxy:
-    image: nginx:alpine
+    image: nginx:1.27-alpine
     ports:
       - "8080:80"
     depends_on:

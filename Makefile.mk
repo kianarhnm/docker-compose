@@ -12,7 +12,7 @@ restart:
 test:
 	docker compose exec backend pytest
 
-prodb:
-	docker compose -f compose.yml -f compose.prod.yml build
+prod:
+	docker build -t kianarhnm/backend:1.0.0 -f bckend/Dockerfile.prod ./bckend
 devb:
-	docker compose -f compose.yml -f compose.dev.yml build
+	docker build -t kianarhnm/frontend:1.0.0 -f front/Dockerfile.prod ./front

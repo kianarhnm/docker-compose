@@ -1,5 +1,6 @@
 services:
   backend:
+    image: kianarhnm/backend:1.0.0
     build:
       context: ./bckend
       dockerfile: Dockerfile.prod
@@ -7,6 +8,7 @@ services:
       DEBUG: "false"
 
   frontend:
+    image: kianarhnm/frontend:1.0.0
     build:
       context: ./front
       dockerfile: Dockerfile.prod
