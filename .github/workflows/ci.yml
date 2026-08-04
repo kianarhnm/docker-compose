@@ -16,15 +16,17 @@ jobs:
           python-version: "3.12"
 
       - name: Install Dependencies
-        working-directory: bckend
-        run: pip install -r requirements.txt
+        run: pip install -r bckend/requirements.txt
 
       - name: Test
-        working-directory: bckend
         run: python bckend/manage.py check
 
   test-frontend:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: front
 
     steps: 
     - uses: actions/checkout@v4
@@ -34,9 +36,7 @@ jobs:
       with: 
         node-version: "20"
     - name: Install Node Dependencies
-      working-directory: front
       run: npm install
 
     - name: Build  
-      working-directory: front
       run: npm run build
