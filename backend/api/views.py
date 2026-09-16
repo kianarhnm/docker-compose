@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
+from django.contrib.auth import authenticate
+
 
 @api_view(["POST"])
 def login(request):
@@ -8,7 +10,12 @@ def login(request):
     username = request.data.get("username")
     password = request.data.get("password")
 
-    if username == "admin" and password == "1234":
+    user = authenticate(
+        username=username,
+        password=password
+    )
+
+    if user is not None:
         return Response({
             "message": "Login Successful"
         })
@@ -19,5 +26,7 @@ def login(request):
         },
         status=401,
     )
+
+
 def health(request):
     return JsonResponse({"status": "healthy"})
