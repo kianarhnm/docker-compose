@@ -5,16 +5,27 @@ on:
 
 jobs:
   deploy:
-    needs:
-      - build-and-push
-    runs-on: self-hosted
-    steps:
-      - name: Deploy to server
-        run: |
-          cd ~/comData/docker-compose
+  needs:
+    - build-and-push
+
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+
+        script: |
+          cd ~/docker-compose
+
           export BACKEND_VERSION=${{ github.sha }}
-          export FRONTEND_VERSION=${{ github.sha}}
+          export FRONTEND_VERSION=${{ github.sha }}
+
           docker compose -f compose.yml -f compose.prod.yml pull
+
           docker compose -f compose.yml -f compose.prod.yml up -d
   build-and-push:
     runs-on: ubuntu-latest
