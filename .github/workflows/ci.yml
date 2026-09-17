@@ -63,6 +63,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Test Harbor connection
+        run: |
+         nslookup harbor.rasamiot.com
+         curl -v --connect-timeout 10 https://harbor.rasamiot.com/v2/
+
 
       - name: Login to Harbor
         uses: docker/login-action@v3
