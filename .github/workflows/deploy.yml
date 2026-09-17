@@ -1,17 +1,31 @@
-- name: Deploy to server
-  uses: appleboy/ssh-action@v1
-  with:
-    host: ${{ secrets.SERVER_HOST }}
-    username: ${{ secrets.SERVER_USER }}
-    key: ${{ secrets.SERVER_SSH_KEY }}
-    passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }}
+name: Deploy
 
-    script: |
-      cd ~/docker-compose
+on:
+  workflow_dispatch:
 
-      docker compose \
-      -f compose.yml \
-      -f compose.prod.yml \
-      up -d
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-      docker compose ps
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }}
+
+          script: |
+            cd ~/docker-compose
+
+            echo "Starting deployment"
+
+            docker compose \
+              -f compose.yml \
+              -f compose.prod.yml \
+              up -d
+
+            echo "Deployment finished"
+
+            docker compose ps
