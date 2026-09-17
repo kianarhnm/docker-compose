@@ -16,15 +16,18 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }}
 
+          timeout: 10m
+          command_timeout: 15m
+
           script: |
             cd ~/docker-compose
 
             echo "Starting deployment"
 
             docker compose \
-              -f compose.yml \
-              -f compose.prod.yml \
-              up -d
+            -f compose.yml \
+            -f compose.prod.yml \
+            up -d
 
             echo "Deployment finished"
 
