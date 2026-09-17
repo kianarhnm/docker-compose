@@ -1,0 +1,155 @@
+name: Project1 CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  test-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Backend Check
+        run: python backend/manage.py check
+
+
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Frontend Build
+        run: npm run build
+
+
+
+  build-and-push:
+
+    needs:
+      - test-backend
+      - test-frontend
+
+    runs-on: ubuntu-latest
+
+
+    permissions:
+      contents: read
+
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: harbor.rasamiot.com
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+
+      - name: Build Backend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile.prod
+          push: true
+          tags: |
+            harbor.rasamiot.com/internship/project1-backend:${{ github.sha }}
+            harbor.rasamiot.com/internship/project1-backend:latest
+
+
+      - name: Build Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.prod
+          push: true
+          tags: |
+            harbor.rasamiot.com/internship/project1-frontend:${{ github.sha }}
+            harbor.rasamiot.com/internship/project1-frontend:latest
+
+
+
+  deploy:
+
+    needs:
+      - build-and-push
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1
+
+        with:
+
+          host: ${{ secrets.SERVER_HOST }}
+
+          username: ${{ secrets.SERVER_USER }}
+
+          key: ${{ secrets.SERVER_SSH_KEY }}
+
+          passphrase: ${{ secrets.SERVER_SSH_PASSPHRASE }}
+
+          timeout: 10m
+
+          command_timeout: 15m
+
+
+          script: |
+
+            cd ~/docker-compose
+
+
+            export BACKEND_VERSION=${{ github.sha }}
+
+            export FRONTEND_VERSION=${{ github.sha }}
+
+
+            echo "Pulling new images..."
+
+            docker compose \
+            -f compose.yml \
+            -f compose.prod.yml pull
+
+
+            echo "Restarting containers..."
+
+            docker compose \
+            -f compose.yml \
+            -f compose.prod.yml up -d
+
+
+            echo "Deployment finished"
+
+            docker compose ps
