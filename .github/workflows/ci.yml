@@ -124,7 +124,7 @@ jobs:
 
           timeout: 10m
 
-          command_timeout: 15m
+          command_timeout: 45m
 
 
           script: |
